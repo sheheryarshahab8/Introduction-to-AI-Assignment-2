@@ -1,0 +1,28 @@
+! pip install ultralytics -q
+from ultralytics import YOLO
+import os
+import random
+
+test_path = "/content/seefood/test"
+
+# Check if the hot dog test directory exists, and if not, re-unzip the archive
+test_hotdog_dir = os.path.join(test_path, "hot_dog")
+if not os.path.exists(test_hotdog_dir):
+    print(f"Directory {test_hotdog_dir} not found. Attempting to re-unzip the dataset.")
+    !unzip -o "/content/drive/MyDrive/AI CEP/archive.zip" -d "/content/" # -o to overwrite if partially unzipped
+    # After re-unzipping, verify again
+    if not os.path.exists(test_hotdog_dir):
+        raise FileNotFoundError(f"Failed to create directory {test_hotdog_dir} even after re-unzipping.")
+
+# Load a tiny pre-trained model
+yolo_model = YOLO("yolov8n.pt") # n = nano (fast, small )
+
+# Get a path to a hot dog image from the test set
+hotdog_image_name = random.choice(os.listdir(test_hotdog_dir))
+hotdog_image_path = os.path.join(test_hotdog_dir, hotdog_image_name)
+
+# Run detection on your hot dog image
+results = yolo_model(hotdog_image_path)
+
+# Show results (it will draw boxes around objects it recognizes )
+results[0].show()
